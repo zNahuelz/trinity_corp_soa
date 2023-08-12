@@ -1,7 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.4"
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8080" doc:name="HTTP Listener Configuration"/>
+	<db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="root" password="12345" database="trinity_corp" doc:name="MySQL Configuration"/>
+	<db:template-query name="Template_Query" doc:name="Template Query">
+		<db:parameterized-query><![CDATA[SELECT SUM(SL.CANTIDAD) AS TOTAL,L.NOMBRE FROM SEDE S INNER JOIN SEDE_LINEA SL ON S.ID_SEDE=SL.ID_SEDE INNER JOIN LINEA L ON SL.ID_LINEA=L.ID_LINEA WHERE SL.FECHA_REGISTRO >=:inicio AND SL.FECHA_REGISTRO <=:fin  GROUP BY L.NOMBRE;]]></db:parameterized-query>
+		<db:in-param name="inicio" type="VARCHAR" defaultValue="#[message.inboundProperties.'http.query.params'.inicio]"/>
+		<db:in-param name="fin" type="VARCHAR" defaultValue="#[message.inboundProperties.'http.query.params'.fin]"/>
+	</db:template-query>
+	<db:template-query name="Template_Query1" doc:name="Template Query">
+		<db:parameterized-query><![CDATA[INSERT INTO SEDE_LINEA(ID_SEDE,ID_LINEA,CANTIDAD,FECHA_REGISTRO) VALUES(:SEDE,:L1,:CANT1,:FECHA),(:SEDE,:L2,:CANT2,:FECHA),(:SEDE,:L3,:CANT3,:FECHA);]]></db:parameterized-query>
+		<db:in-param name="SEDE" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('SEDE').toString())]"/>
+		<db:in-param name="L1" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('L1').toString())]"/>
+		<db:in-param name="L2" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('L2').toString())]"/>
+		<db:in-param name="L3" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('L3').toString())]"/>
+		<db:in-param name="CANT1" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('CANT1').toString())]"/>
+		<db:in-param name="CANT2" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('CANT2').toString())]"/>
+		<db:in-param name="CANT3" type="INTEGER" defaultValue="#[Integer.parseInt(message.payload.get('CANT3').toString())]"/>
+		<db:in-param name="FECHA" type="VARCHAR" defaultValue="#[message.payload.get('FECHA').toString().replaceAll('\&quot;','')]"/>
+	</db:template-query>
+	<db:template-query name="Template_Query2" doc:name="Template Query">
+		<db:parameterized-query><![CDATA[SELECT U.NOMBRE,U.PATERNO,U.MATERNO,U.EMAIL,U.USUARIO,U.CONTRASENA,US.ID_SEDE FROM USUARIOS U INNER JOIN USUARIO_SEDE US ON U.ID_USUARIO=US.ID_USUARIO WHERE BINARY U.USUARIO =:usr AND BINARY U.CONTRASENA =:pass;]]></db:parameterized-query>
+		<db:in-param name="usr" type="VARCHAR" defaultValue="#[message.inboundProperties.'http.query.params'.usr]"/>
+		<db:in-param name="pass" type="VARCHAR" defaultValue="#[message.inboundProperties.'http.query.params'.pass]"/>
+	</db:template-query>
+	<flow name="ConsultaRangoFechas">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/c/rango_fechas" allowedMethods="GET" doc:name="HTTP"/>
+		<db:select config-ref="MySQL_Configuration" doc:name="Database">
+			<db:template-query-ref name="Template_Query"/>
+		</db:select>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+	<flow name="InsertarProduccion">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/i/produccion" allowedMethods="POST" doc:name="HTTP"/>
+		<json:json-to-object-transformer doc:name="JSON to Object"/>
+		<db:insert config-ref="MySQL_Configuration" doc:name="Database">
+			<db:template-query-ref name="Template_Query1"/>
+		</db:insert>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+	<flow name="IniciarSesion">
+		<http:listener config-ref="HTTP_Listener_Configuration" path="/s/login" allowedMethods="GET" doc:name="HTTP"/>
+		<db:select config-ref="MySQL_Configuration" doc:name="Database">
+			<db:template-query-ref name="Template_Query2"/>
+		</db:select>
+		<json:object-to-json-transformer doc:name="Object to JSON"/>
+	</flow>
+</mule>
