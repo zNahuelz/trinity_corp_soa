@@ -1,0 +1,122 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html{
+  font-size: 62.5%;
+  
+}
+
+body{
+  background-color: #D9AFD9;
+  background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
+  background-repeat: no-repeat;
+  height: 100%;
+}
+
+.navegacion{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.navegacion a{
+  font-size: 3.6rem;
+  text-decoration: none;
+  color: steelblue;
+  font-weight: 700;
+}
+
+main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.login-container{
+  height: 340px;
+  border-radius: 7px;
+  box-shadow: 0px 20px 61px 11px rgba(0,0,0,0.47);
+  padding: 40px;
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 72px;
+}
+
+.login-container h1{
+  color: steelblue;
+  font-size: 2.9rem;
+}
+
+.login-username, .login-password{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: 24px 0;
+}
+
+.login{
+  font-size: 1.4rem;
+}
+
+#login-username-input, #login-password-input{
+  width: 100%;
+  height: 28px;
+  border-radius: 4px;
+  margin-top: 8px;
+  padding-left: 8px;
+  border: none;
+  border-bottom: solid white;
+  background: none;
+  outline: none;
+}
+
+#login-username-input::placeholder, #login-password-input::placeholder{
+  color: rgba(255, 255, 255, 0.8);
+}
+
+#login-username-input:focus, #login-password-input:focus{
+  color: rgba(255, 255, 255, 1);
+  border-bottom: solid steelblue;
+}
+
+.login-button{
+  padding: 5px;
+  border-radius: 8px;
+  background: steelblue;
+  border: none;
+  font-size: 1.4rem;
+  color: #D9AFD9;
+  outline: none;
+}
+
+footer{
+  height: 120px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-content{
+  display: flex;
+  list-style: none;
+  gap: 20px;
+  font-size: 1.6rem;
+  color: steelblue;
+}
+
+.footer-content li:hover{
+  text-decoration: underline white;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+}
