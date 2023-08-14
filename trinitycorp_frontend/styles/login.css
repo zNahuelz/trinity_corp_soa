@@ -75,6 +75,7 @@ main{
   border-bottom: solid white;
   background: none;
   outline: none;
+  color: white;
 }
 
 #login-username-input::placeholder, #login-password-input::placeholder{

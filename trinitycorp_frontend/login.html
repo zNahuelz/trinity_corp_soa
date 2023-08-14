@@ -10,25 +10,25 @@
 <body>
   <header>
     <nav class="navegacion">
-        <a class="" href="#">
-          Trinity Corp
-        </a>
+      <h1 class="">
+        Trinity Corp
+      </h1>
     </nav>
   </header>
 
   <main>
     <div class="login-container">
       <h1>Login</h1>
-      <form action="" class="login">
-        <div class="login-username">
-          <input type="text" placeholder="Usuario o Correo" required id="login-username-input">
-        </div>
+      <form class="login">
+          <div class="login-username">
+            <input type="text" placeholder="Usuario o Correo" required autocomplete="off" id="login-username-input" name="username" title="Ingrese su nombre de usuario">
+          </div>
 
-        <div class="login-password">
-          <input type="password" placeholder="Contraseña" required id="login-password-input">
-        </div>
+          <div class="login-password">
+            <input type="password" placeholder="Contraseña" required autocomplete="off" id="login-password-input" name="password" title="Ingrese su contraseña">
+          </div>
 
-        <button type="button" class="login-button">Ingresar</button>
+        <input type="submit" class="login-button" value="Ingresar"/>
       </form>
     </div>
   </main>
@@ -45,14 +45,60 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   <script>
     const formulario = document.querySelector(".login");
-
-    function obtenerDatos(evento){
-      evento.preventDefault()
-      const datosFormulario = new FormData(formulario)
-      return datosFormulario
-    }
+    
+    
+    formulario.addEventListener("submit", (evento)=>{
+      evento.preventDefault();
+      validarDatos()
+    })
 
     
+
+    function validarDatos(){
+      let usuario;
+      let datos = obtenerDatosFormulario();
+      let arrUsrPass = filtrarArray(datos)
+      fetch(`http://localhost:8080/s/login?usr=${arrUsrPass[0]}&pass=${arrUsrPass[1]}`)
+        .then(res => res.json())
+        .then(datosUser => {
+          if (datosUser.length == 0){
+            alert("Los datos ingresados son incorrectos, intente de nuevo.")
+          }
+          else{
+            alert("Datos Correctos")
+            console.log(datosUser[0].ID_USUARIO)
+            usuario = datosUser[0]
+            // 
+          }
+        })
+        .catch(err => console.log(err))
+        .finally(()=>{
+          setUserLogin(usuario.ID_USUARIO); 
+          window.location.assign('./index.html')
+        })
+    }
+
+
+    function obtenerDatosFormulario(){
+      const datosFormulario = new FormData(formulario);
+      const datosFormularioArray = [...datosFormulario];
+      return datosFormularioArray;
+    }
+
+    function setUserLogin(id_usuario){
+      fetch(`http://localhost:8080/SetearLogin?id=${id_usuario}`)
+        .then(res => res.json())
+        .then(datosUser => {
+          alert("Funciona weon")
+        })
+        .catch(err => console.log(err))
+    }
+
+    function filtrarArray(array){
+      return array.map(elemento =>{
+        return elemento[1]
+      })
+    }
   </script>
 </body>
 </html>

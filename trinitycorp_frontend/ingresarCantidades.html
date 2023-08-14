@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles/ingresarCantidades.css">
+</head>
+<body>
+  <main>
+    <div class="insert-container">
+      <h1>Ingrese las cantidades de cada línea en el día de hoy</h1>
+      <h1>Su línea es: <span class="line-name"></span></h1>
+      <h1 class="alertMessage btn-danger"></h1>
+      <form class="insert">
+          <div class="insert-lineA">
+            <input type="number" placeholder="Cantidad de línea A" required autocomplete="off"  name="lineaA" title="Ingrese la cantidad para la línea A" class="input-lineA">
+          </div>
+
+          <div class="insert-lineB">
+            <input type="number" placeholder="Cantidad de línea B" required autocomplete="off"  name="lineaB" title="Ingrese la cantidad para la línea B" class="input-lineB">
+          </div>
+
+          <div class="insert-lineC">
+            <input type="number" placeholder="Cantidad de línea C" required autocomplete="off"  name="lineaC" title="Ingrese la cantidad para la línea C" class="input-lineC">
+          </div>
+
+        <input type="submit" class="insert-button" value="Ingresar"/>
+      </form>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+  <script>
+
+    const botonInsertar = document.querySelector(".insert-button")
+    const formulario = document.querySelector('.insert')
+    const nombreLinea = document.querySelector('.line-name')
+    let idSede = 0;
+
+    window.addEventListener("load", () => {
+      mostrarNombreLinea();
+      validarIngresado()
+    })
+
+    formulario.addEventListener("submit", (evento)=>{
+      evento.preventDefault();
+      enviarDatosLinea()
+      validarIngresado()
+    })
+
+    function enviarDatosLinea(){
+      const produccion = obtenerDatosFormulario();
+      const payload = {
+        "SEDE": idSede,
+        "L1": 1,
+        "L2": 2,
+        "L3": 3,
+        "CANT1": parseInt(produccion[0]),
+        "CANT2": parseInt(produccion[1]),
+        "CANT3": parseInt(produccion[2]),
+        "FECHA": new Date().toJSON().slice(0,10)
+      }
+      fetch('http://localhost:8080/i/produccion', {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(err => console.log(err))
+    }
+
+    //Validamos si en el día de la fecha se han ingresado datos 
+    function validarIngresado(){
+      //Creando el dia de hoy
+      const fechaHoy = new Date();
+      const diaHoy = fechaHoy.getDate();
+      const mesHoy = fechaHoy.getMonth()+1;
+      const anioHoy = fechaHoy.getFullYear();
+      let diaCompletoHoy;
+      //Validando si el mes es menor a 10, ya que el mes se muestra sin 0
+      if (mesHoy < 10){
+        diaCompletoHoy = `${anioHoy}-0${mesHoy}-${diaHoy}`
+      }
+      else{
+        diaCompletoHoy = `${anioHoy}-${mesHoy}-${diaHoy}`
+      }
+      //Obteniendo los inputs para deshabilitarlos si ya se ingresó en la fecha de hoy
+      const inputA = document.querySelector('.input-lineA')
+      const inputB = document.querySelector('.input-lineB')
+      const inputC = document.querySelector('.input-lineC')
+      const boton = document.querySelector('.insert-button')
+      const mensaje = document.querySelector('.alertMessage')
+      fetch(`http://localhost:8080/Produccion/fechas?fecha=${diaCompletoHoy}&sede=${idSede}`)
+      .then(res => res.json())
+      .then(info => {
+        if (info.length != 0){
+          inputA.disabled = true;
+          inputB.disabled = true;
+          inputC.disabled = true;
+          boton.disabled = true;
+          
+          const mensajeTexto = document.createTextNode('Ya ingresó los datos por el día de hoy, vuelva mañana');
+          mensaje.appendChild(mensajeTexto)
+        }
+      })
+    }
+
+
+    function obtenerDatosFormulario(){
+      const datosFormulario = new FormData(formulario);
+      const datosFormularioArray = [...datosFormulario];
+      return filtrarArray(datosFormularioArray);
+      // return datosFormularioArray;
+    }
+
+    function mostrarNombreLinea(){
+      fetch('http://localhost:8080/ListarUsuarios/activos')
+      .then(res => res.json())
+      .then(datos => {
+        const nombreCiudad = document.createTextNode(`${datos[0].ciudad}`)
+        nombreLinea.appendChild(nombreCiudad)
+        idSede = datos[0].id_sede
+        
+      })
+    }
+
+    function filtrarArray(array){
+      return array.map(elemento => {
+        return elemento[1]
+      })
+    }
+
+  </script>
+</body>
+</html>

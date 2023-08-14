@@ -7,11 +7,20 @@
   <link rel="stylesheet" href="./styles/index.css">
   <title>Document</title>
   <style>
-    header{
+    header h1{
       height: 120px;
       text-align: center;
       padding-top: 40px;
     }
+    header a {
+      text-align: start;
+      
+    }
+
+    header a:hover{
+      cursor: pointer;
+    }
+
     main{
       display: flex;
       flex-direction: row;
@@ -50,24 +59,69 @@
 <body>
   
   <header>
-    <h1>Bienvenido, <span>Cesar</span>. ¿Qué harás hoy?</h1>
+    <h1>Bienvenido, <span class="nombre_usuario"></span>. ¿Qué harás hoy?</h1>
+    <a class="regresar">Regresar al login</a>
   </header>
 
   <main>
-    <a href="">
-      <button class="ingresar">
-        Ingresar datos de las líneas
-      </button>
-    </a>
-    <a href="">
-      <button class="mostrar">
-        Ver la producción de las líneas
-      </button>
-    </a>
+    <button class="ingresar">
+      Ingresar datos de las líneas
+    </button>
+    <button class="mostrar">
+      Ver la producción de las líneas
+    </button>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   <script>
+    const regresar = document.querySelector('.regresar');
+    const ingresar = document.querySelector('.ingresar');
+    const mostrar = document.querySelector('.mostrar');
+    const span_nombre = document.querySelector('.nombre_usuario')
+
+    window.addEventListener("load", () =>{
+      mostrarDatoUsuario()
+    })
+
+    regresar.addEventListener("click", (event) =>{
+      event.preventDefault();
+      lougoutUsuario()
+    })
+
+    ingresar.addEventListener("click", (event) =>{
+      event.preventDefault();
+      window.location = "./ingresarCantidades.html"
+    })
+
+    mostrar.addEventListener("click", (event) =>{
+      event.preventDefault();
+      window.location = "./mostrarCantidades.html"
+    })
+
+    function mostrarDatoUsuario(){
+      fetch('http://localhost:8080/ListarUsuarios/activos')
+      .then(res => res.json())
+      .then(usuarioActivo => {
+        let nombre = document.createTextNode(`${usuarioActivo[0].nombre}`)
+        span_nombre.appendChild(nombre)
+      })
+      .catch(err => console.log(err))
+    }
+
+    function lougoutUsuario(){
+      if (confirm("¿Desea Cerrar Sesión?")){
+        fetch('http://localhost:8080/LogoutUsuario')
+          .then(res => {
+            res.json();
+            alert("Funciona weon")
+          })
+          .then(usuarioActivo => {
+            
+          })
+          .catch(err => console.log(err))
+          .finally(()=> window.location.assign("./login.html"))
+      }
+    }
 
   </script>
 </body>

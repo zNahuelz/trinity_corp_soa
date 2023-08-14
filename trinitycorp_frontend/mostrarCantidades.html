@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <title>Document</title>
+</head>
+<body>
+  <main class="container">
+    <form action="">
+      <input type="date" name="begin-date" id="begin-date">
+      <input type="date" name="end-date" id="end-date">
+      <button type="submit">Consultar</button>
+    </form>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Línea</th>
+          <th scope="col">Cantidad</th>
+        </tr>
+      </thead>
+      <tbody class="first-city-table">
+        
+      </tbody>
+    </table>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Línea</th>
+          <th scope="col">Cantidad</th>
+        </tr>
+      </thead>
+      <tbody class="second-city-table">
+        
+      </tbody>
+    </table>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Línea</th>
+          <th scope="col">Cantidad</th>
+        </tr>
+      </thead>
+      <tbody class="third-city-table">
+        
+      </tbody>
+    </table>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  <script>
+    //Formulario 
+    const formulario = document.querySelector('form')
+    let hola = [];
+
+    //Otras variables
+    let idSedeUsuario;
+    let nombreSedeUsuario;
+    let otrasSedes;
+
+    //EventListeners
+    window.addEventListener("load", ()=>{
+      obtenerIdSede();
+      obtenerListadoSedes();
+    })
+
+    formulario.addEventListener("submit", (evento) => {
+      evento.preventDefault()
+      ordenDeTablas()
+    })
+
+    //Funciones complementarias
+    function obtenerIdSede(){
+      fetch(`http://localhost:8080/ListarUsuarios/activos`)
+        .then(res => res.json())
+        .then(datosUsuarioActivo => {
+          idSedeUsuario = datosUsuarioActivo[0].id_sede
+          nombreSedeUsuario = datosUsuarioActivo[0].ciudad
+        })
+    }
+
+    function obtenerListadoSedes(){
+      fetch(`http://localhost:8080/ListarSedes`)
+        .then(res => res.json())
+        .then(datosSede => {
+          otrasSedes = datosSede.filter(elemento => elemento.id_sede != idSedeUsuario)
+        })
+    }
+
+    function ordenDeTablas(){
+      obtenerProduccion('first', nombreSedeUsuario, idSedeUsuario);
+      obtenerProduccion('second', otrasSedes[0].ciudad, otrasSedes[0].id_sede);
+      obtenerProduccion('third', otrasSedes[1].ciudad, otrasSedes[1].id_sede);
+    }
+
+    function obtenerProduccion(orden_tabla, nombre_ciudad, sede){
+      //Seleccionando el contenedor
+      const tabla = document.querySelector(`.${orden_tabla}-city-table`);
+      //Eliminando todos los hijos, si es que tiene
+      while (tabla.firstChild){
+        tabla.removeChild(tabla.firstChild)
+      }
+      const datos = obtenerDatosFormulario();
+      fetch(`http://localhost:8080/c/rango_fechas?inicio=${datos[0]}&fin=${datos[1]}&sede=${sede}`)
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(linea => {
+            debugger;
+            //Creando los textos
+            const nombreCiudadTexto = document.createTextNode(nombre_ciudad);
+            const nombreLineaTexto = document.createTextNode(linea.NOMBRE)
+            const totalLineaTexto = document.createTextNode(linea.TOTAL)
+            //Creando los contenedores de los textos
+            const tr = document.createElement('tr')
+            const nombreCiudadContenedor = document.createElement('td');
+            const nombreLineaContenedor = document.createElement('td');
+            const totalLineaContenedor = document.createElement('td');
+            //Agregando el texto
+            nombreCiudadContenedor.appendChild(nombreCiudadTexto);
+            nombreLineaContenedor.appendChild(nombreLineaTexto);
+            totalLineaContenedor.appendChild(totalLineaTexto);
+            //Agregando contenedores a la tabla
+            tabla.appendChild(tr)
+            tr.appendChild(nombreCiudadContenedor);
+            tr.appendChild(nombreLineaContenedor);
+            tr.appendChild(totalLineaContenedor);
+          })
+        })
+      
+    }
+
+    function obtenerDatosFormulario(){
+      const datosFormulario = new FormData(formulario);
+      const datosFormularioArray = [...datosFormulario];
+      return filtrarArray(datosFormularioArray);
+    }
+
+    function filtrarArray(array){
+      return array.map(elemento => {
+        return elemento[1];
+      })
+    }
+  </script>
+</body>
+</html>
