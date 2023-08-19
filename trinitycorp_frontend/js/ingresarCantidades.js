@@ -14,7 +14,6 @@ window.addEventListener("load", () => {
 formulario.addEventListener("submit", (evento)=>{
   evento.preventDefault();
   enviarDatosLinea()
-  validarIngresado()
 })
 
 //Funciones 
@@ -37,6 +36,9 @@ function enviarDatosLinea(){
   .then(res => res.json())
   .then(data => console.log(data))
   .catch(err => console.log(err))
+  .finally(() => {
+    validarIngresado()
+  })
 }
 
 //Validamos si en el día de la fecha se han ingresado datos 
