@@ -68,3 +68,12 @@ body{
 }
 
 
+.regresar{
+  font-size: 2.5rem;
+  color: steelblue;
+  margin-left: 24px;
+}
+
+.regresar:hover{
+  cursor: pointer
+}

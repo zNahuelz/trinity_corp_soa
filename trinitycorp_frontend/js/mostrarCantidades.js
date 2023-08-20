@@ -1,15 +1,21 @@
 //Formulario 
-const formulario = document.querySelector('form')
+const formulario = document.querySelector("form")
+const regresar = document.querySelector(".regresar")
 
 //Otras variables
 let idSedeUsuario;
 let nombreSedeUsuario;
-let otrasSedes;
+let otrasSedes = [];
 
 //EventListeners
 window.addEventListener("load", ()=>{
   obtenerIdSede();
   obtenerListadoSedes();
+})
+
+regresar.addEventListener("click", (evento) => {
+  evento.preventDefault();
+  window.location.assign("./index.html")
 })
 
 formulario.addEventListener("submit", (evento) => {
@@ -32,7 +38,11 @@ function obtenerListadoSedes(){
   fetch(`http://localhost:8080/c/sedes`)
     .then(res => res.json())
     .then(datosSede => {
-      otrasSedes = datosSede.filter(elemento => elemento.id_sede != idSedeUsuario)
+      datosSede.forEach(elemento => {
+        if (elemento.id_sede != idSedeUsuario){
+          otrasSedes.push(elemento)
+        }
+      })
       debugger
     })
 }
@@ -56,8 +66,8 @@ function obtenerProduccion(orden_tabla, nombre_ciudad, sede){
   fetch(`http://localhost:8080/c/rango_fechas?inicio=${datos[0]}&fin=${datos[1]}&sede=${sede}`)
     .then(res => res.json())
     .then(data => {
+      let sumaTotal = 0;
       data.forEach(linea => {
-        debugger;
         //Creando los textos
         const nombreCiudadTexto = document.createTextNode(nombre_ciudad);
         const nombreLineaTexto = document.createTextNode(linea.NOMBRE)
@@ -72,11 +82,30 @@ function obtenerProduccion(orden_tabla, nombre_ciudad, sede){
         nombreLineaContenedor.appendChild(nombreLineaTexto);
         totalLineaContenedor.appendChild(totalLineaTexto);
         //Agregando contenedores a la tabla
-        tabla.appendChild(tr)
         tr.appendChild(nombreCiudadContenedor);
         tr.appendChild(nombreLineaContenedor);
         tr.appendChild(totalLineaContenedor);
-      })
+        tabla.appendChild(tr)
+        //Sumando la proudcción de cada linea
+        sumaTotal += linea.TOTAL
+      });
+      //Creando texto para el total
+      const totalTexto =document.createTextNode("Total");
+      const sumaTotalTexto = document.createTextNode(sumaTotal);
+      //Creando contenedores para agregar las celdas y agregar los textos
+      const tr = document.createElement("tr");
+      const totalContenedor = document.createElement("td");
+      const sumaTotalContenedor = document.createElement("td")
+      sumaTotalContenedor.classList.add("texto_suma_total")
+      totalContenedor.colSpan = 2;
+      totalContenedor.classList.add("texto_total")
+      //Agregando los textos 
+      totalContenedor.appendChild(totalTexto);
+      sumaTotalContenedor.appendChild(sumaTotalTexto);
+      //Agregando celdas
+      tr.appendChild(totalContenedor);
+      tr.appendChild(sumaTotalContenedor)
+      tabla.appendChild(tr)
     })
   
 }

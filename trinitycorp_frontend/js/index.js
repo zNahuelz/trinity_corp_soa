@@ -16,12 +16,12 @@ regresar.addEventListener("click", (event) =>{
 
 ingresar.addEventListener("click", (event) =>{
   event.preventDefault();
-  window.location = "./ingresarCantidades.html"
+  window.location.assign("./ingresarCantidades.html")
 })
 
 mostrar.addEventListener("click", (event) =>{
   event.preventDefault();
-  window.location = "./mostrarCantidades.html"
+  window.location.assign("./mostrarCantidades.html")
 })
 
 

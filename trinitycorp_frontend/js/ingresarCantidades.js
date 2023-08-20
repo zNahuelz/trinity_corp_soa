@@ -2,6 +2,7 @@
 const botonInsertar = document.querySelector(".insert-button")
 const formulario = document.querySelector('.insert')
 const nombreSede = document.querySelector('.line-name')
+const regresar = document.querySelector(".regresar")
 
 //Variables a utilizar
 let idSede;
@@ -9,6 +10,11 @@ let idSede;
 //Event listeners
 window.addEventListener("load", () => {
   mostrarNombreCiudad();
+})
+
+regresar.addEventListener("click", (evento) => {
+  evento.preventDefault();
+  window.location.assign("./index.html")
 })
 
 formulario.addEventListener("submit", (evento)=>{

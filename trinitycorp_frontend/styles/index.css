@@ -16,3 +16,60 @@ body{
   height: 100%;
 }
 
+header h1{
+  height: 120px;
+  text-align: center;
+  padding-top: 40px;
+  font-size: 35px;
+  font-weight: bold;
+}
+header a {
+  text-align: start;
+  
+}
+
+header a:hover{
+  cursor: pointer;
+}
+
+main{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  height: 100%;
+}
+
+button{
+  width: 300px;
+  border-radius: 5px;
+  height: 60px;
+  padding: 8px;
+  margin: 24px 0 0 0;
+  border: none;
+  box-shadow: 0px 15px 80px 5px rgba(0,0,0,0.47);
+  font-size: 1.8rem;
+}
+
+.ingresar{
+  background-color: rgba(142, 223, 225, 0.5);
+
+}
+.ingresar:hover{
+  background-color: rgba(2, 157, 160, 0.5);
+
+}
+
+.mostrar{
+  background-color: rgba(225, 142, 210, 0.5);
+}
+.mostrar:hover{
+  background-color: rgba(140, 9, 116, 0.5);
+}
+
+.regresar{
+  font-size: 2.5rem;
+  color: steelblue;
+  margin-left: 24px;
+}
