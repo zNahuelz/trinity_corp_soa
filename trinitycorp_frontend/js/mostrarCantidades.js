@@ -43,7 +43,6 @@ function obtenerListadoSedes(){
           otrasSedes.push(elemento)
         }
       })
-      debugger
     })
 }
 
@@ -90,7 +89,7 @@ function obtenerProduccion(orden_tabla, nombre_ciudad, sede){
         sumaTotal += linea.TOTAL
       });
       //Creando texto para el total
-      const totalTexto =document.createTextNode("Total");
+      const totalTexto = document.createTextNode("Total");
       const sumaTotalTexto = document.createTextNode(sumaTotal);
       //Creando contenedores para agregar las celdas y agregar los textos
       const tr = document.createElement("tr");

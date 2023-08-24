@@ -34,7 +34,9 @@ function enviarDatosLinea(){
     "CANT2": parseInt(produccion[1]),
     "CANT3": parseInt(produccion[2]),
     "FECHA": new Date().toJSON().slice(0,10)
+
   }
+  debugger
   fetch('http://localhost:8080/i/produccion', {
     method: "POST",
     body: JSON.stringify(payload)
